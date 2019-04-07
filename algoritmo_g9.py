@@ -1,21 +1,49 @@
 import numpy as np
 
 POPULATION_SIZE = 200
+evaluaciones = 0
+
+class Individuo:
+        aptitud = 0.0
+        solucion = list()
 
 # region Funciones Matemáticas
 
-
 def aptitud(lista):
-    return (((lista[0]-10)**2)
-        + (5 * ((lista[1]-12)**2))
-        + (lista[2]**4)
-        + 3 * ((lista[3]-11)**2)
-        + 10 * (lista[4]**6)
-        + 7 * (lista[5]**2)
-        + (lista[6]**4)
-        - 4 * (lista[5] * lista[6])
-        - 10 * (lista[5])
-        - 8 * (lista[6]))
+    global evaluaciones
+    evaluaciones = evaluaciones + 1
+    validaciones = 0
+    if (g1(lista)):
+        validaciones = validaciones + 1
+    
+    if (g2(lista)):
+        validaciones = validaciones + 1
+    
+    if (g3(lista)):
+        validaciones = validaciones + 1
+    
+    if (g4(lista)):
+        validaciones = validaciones + 1
+
+    if (validaciones == 4):
+        return (((lista[0]-10)**2)
+                + (5 * ((lista[1]-12)**2))
+                + (lista[2]**4)
+                + 3 * ((lista[3]-11)**2)
+                + 10 * (lista[4]**6)
+                + 7 * (lista[5]**2)
+                + (lista[6]**4)
+                - 4 * (lista[5] * lista[6])
+                - 10 * (lista[5])
+                - 8 * (lista[6]))
+    elif (validaciones == 3):
+        return 1000000000.00
+    elif (validaciones == 2):
+        return 2000000000.00
+    elif (validaciones == 1):
+        return 3000000000.00
+    elif (validaciones == 0):
+        return 4000000000.00                    
 
 
 def g1(lista):
@@ -49,25 +77,114 @@ def g4(lista):
 
 # endregion
 
+# region Funciones algoritmo genetico
+def seleccion(poblacion):
+    if (len(poblacion) <= 20):
+        return poblacion
+    else:
+        padres = list()
+        for i in range(0, len(poblacion), 2):
+            if (poblacion[i].aptitud < poblacion[i+1].aptitud):
+                padres.append(poblacion[i])
+            else:
+                padres.append(poblacion[i+1])
+        return seleccion(padres)
+    
+def cruza(padres):
+    solucionHijoA = list()
+    solucionHijoB = list()
+    hijos = list()
+    hijoA = Individuo()
+    hijoB = Individuo()
+    for i in range(0,20,2):
+        solucionHijoA.clear()
+        solucionHijoB.clear()
+        for j in range(4):
+            solucionHijoA.append(padres[i].solucion[j])
+            solucionHijoB.append(padres[i+1].solucion[j])
+        for j in range(4,8):            
+            hijo = round((padres[i].solucion[j]*0.5)+(padres[i+1].solucion[j]*0.5),2)
+            solucionHijoA.append(hijo)
+            solucionHijoB.append(hijo)
+        hijoA.solucion = solucionHijoA
+        hijoB.solucion = solucionHijoB
+        hijos.append(hijoA)
+        hijos.append(hijoB)
+    return hijos        
 
+def mutacion(hijos):
+    hijosMutados = list()
+    for i in range(len(hijos)):
+        posicion = np.random.randint(1,8)
+        hijos[i].solucion[posicion] = np.around(np.random.uniform(-10, 10),decimals=2)
+        hijos[i].aptitud = (aptitud(hijos[i].solucion))
+        hijosMutados.append(hijos[i])
+    return hijosMutados
+
+# endregion
 
 if __name__ == "__main__":
     population = list()
-
+    mejor = Individuo()
+    generacion = 1
+    padres = list()
     # Población Inicial
-    population = [np.around(np.random.uniform(-10, 10, size=(7)), decimals=2) for _ in range(POPULATION_SIZE)]
-    for i in range(POPULATION_SIZE):
-        print(str(i + 1) + ".- " + str(population[i]))
-        print("\tRestricción 1: " + str(g1(population[i])))
-        print("\tRestricción 2: " + str(g2(population[i])))
-        print("\tRestricción 3: " + str(g3(population[i])))
-        print("\tRestricción 4: " + str(g4(population[i])))
-        print("\tAptitud: " + str(aptitud(population[i])))
 
+    for i in range(POPULATION_SIZE):
+        individuo = Individuo()
+        individuo.solucion = np.around(np.random.uniform(-10, 10, size=(8)),decimals=2)
+        print(individuo.solucion)
+        individuo.aptitud = aptitud(individuo.solucion)
+        population.append(individuo)
+
+    # population = [np.around(np.random.uniform(-10, 10, size=(7)), decimals=2) for _ in range(POPULATION_SIZE)]
+    # for i in range(POPULATION_SIZE):
+     #   print(str(i + 1) + ".- " + str(population[i].solucion))
+      #  print("\tRestricción 1: " + str(g1(population[i].solucion)))
+       # print("\tRestricción 2: " + str(g2(population[i].solucion)))
+      #  print("\tRestricción 3: " + str(g3(population[i].solucion)))
+     #   print("\tRestricción 4: " + str(g4(population[i].solucion)))
+    #    print("\tAptitud: " + str(population[i].aptitud))
+
+    
     print("------------------------ Ordenamiento")
     # Orden por aptitud Mínima
-    population.sort(key=lambda x: aptitud(x), reverse=False)
+    population.sort(key=lambda x: x.aptitud, reverse=False)
     
     for i in range(POPULATION_SIZE):
-        print(str(i + 1) + ".- " + str(population[i]))
-        print("\tAptitud: " + str(aptitud(population[i])))
+        print(str(i + 1) + ".- " + str(population[i].solucion))
+        print("\tAptitud: " + str(population[i].aptitud))
+
+    mejor = population[0]
+    print("Mejor generacion " + str(generacion))
+    print("\t " + str(mejor.solucion))
+    print("Aptitud: " + str(mejor.aptitud))
+
+    while (population[0].aptitud != 0 and evaluaciones < 220000):                
+        padres.clear()
+        mejor = population[0]
+        # print("------------------------ Seleccion de padres")
+        for i in range (160):
+                padres.append(population[i])
+        padres = seleccion(padres)
+        #for i in range(len(padres)):
+         #       print(str(i + 1) + ".- " + str(padres[i].solucion))
+          #      print("\tAptitud: " + str(padres[i].aptitud))
+
+        # print("------------------------ Cruza y mutacion")
+        hijos = cruza(padres)
+        hijos = mutacion(hijos)
+        #for i in range(len(hijos)):
+         #       print(str(i + 1) + ".- " + str(hijos[i].solucion))
+          #      print("\tAptitud: " + str(hijos[i].aptitud))
+        population = population + hijos
+        
+        population.sort(key=lambda x: x.aptitud, reverse=False)
+        for i in range(20):
+            population.pop()
+
+        print("Mejor generacion " + str(generacion))
+        print("\t " + str(mejor.solucion))
+        print("Aptitud: " + str(mejor.aptitud))
+        generacion = generacion + 1
+    
