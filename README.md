@@ -22,3 +22,7 @@ Donde <img src="https://latex.codecogs.com/gif.latex?-10\leq{x_i}\leq10,(i&space
 - Tamaño de población = 200.
 - Número de evaluaciones máximas: 220,000.
 - **Reportar:** Mejor, mediana, peor, desviación estándar, de los mejores y gráfica de convergencia del mejor, peor y mediana.
+
+## Análisis de Resultados
+
+El documento interactivo con los resultados se encuentra hosteado en: https://manolomon.github.io/algoritmo-genetico/
