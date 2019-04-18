@@ -1,4 +1,6 @@
 import numpy as np
+import csv
+import sys
 
 POPULATION_SIZE = 200
 evaluaciones = 0
@@ -12,20 +14,15 @@ class Individuo:
 def aptitud(lista):
     global evaluaciones
     evaluaciones = evaluaciones + 1
-    validaciones = 0
-    if (g1(lista)):
-        validaciones = validaciones + 1
-    
-    if (g2(lista)):
-        validaciones = validaciones + 1
-    
-    if (g3(lista)):
-        validaciones = validaciones + 1
-    
-    if (g4(lista)):
-        validaciones = validaciones + 1
-
-    if (validaciones == 4):
+    if not (g1(lista)):
+        return 1000000000.00
+    if not (g2(lista)):
+        return 1000000000.00
+    if not (g3(lista)):
+        return 1000000000.00
+    if not (g4(lista)):
+        return 1000000000.00
+    else:
         return (((lista[0]-10)**2)
                 + (5 * ((lista[1]-12)**2))
                 + (lista[2]**4)
@@ -36,14 +33,7 @@ def aptitud(lista):
                 - 4 * (lista[5] * lista[6])
                 - 10 * (lista[5])
                 - 8 * (lista[6]))
-    elif (validaciones == 3):
-        return 1000000000.00
-    elif (validaciones == 2):
-        return 2000000000.00
-    elif (validaciones == 1):
-        return 3000000000.00
-    elif (validaciones == 0):
-        return 4000000000.00                    
+              
 
 
 def g1(lista):
@@ -116,28 +106,42 @@ def mutacion(hijos):
     hijosMutados = list()
     for i in range(len(hijos)):
         posicion = np.random.randint(1,8)
-        hijos[i].solucion[posicion] = np.around(np.random.uniform(-10, 10),decimals=2)
+        hijos[i].solucion[posicion] = np.around(np.random.uniform(-10, 10),decimals=3)
         hijos[i].aptitud = (aptitud(hijos[i].solucion))
         hijosMutados.append(hijos[i])
     return hijosMutados
 
 # endregion
 
+def imprimir(ejecucion, population, gen):
+    with open(str(ejecucion) + "output.csv", "a") as file:
+        writer = csv.writer(file, delimiter=',')
+        for i in range(len(population)):
+            atk = population[i].aptitud
+            listat = [gen, atk]
+            writer.writerow(listat)
+        file.close()
+
 if __name__ == "__main__":
     population = list()
     mejor = Individuo()
+    ejecucion = sys.argv[1]
     generacion = 1
     padres = list()
     # Población Inicial
+    with open(str(ejecucion) + "output.csv", "a") as file:
+        writer = csv.writer(file, delimiter=',')
+        writer.writerow(["generacion", "aptitud"])
+        file.close()
 
-    for i in range(POPULATION_SIZE):
+    for _ in range(POPULATION_SIZE):
         individuo = Individuo()
-        individuo.solucion = np.around(np.random.uniform(-10, 10, size=(8)),decimals=2)
+        individuo.solucion = np.around(np.random.uniform(-10, 10, size=(8)),decimals=3)
         print(individuo.solucion)
         individuo.aptitud = aptitud(individuo.solucion)
         population.append(individuo)
 
-    # population = [np.around(np.random.uniform(-10, 10, size=(7)), decimals=2) for _ in range(POPULATION_SIZE)]
+    # population = [np.around(np.random.uniform(-10, 10, size=(7)), decimals=3) for _ in range(POPULATION_SIZE)]
     # for i in range(POPULATION_SIZE):
      #   print(str(i + 1) + ".- " + str(population[i].solucion))
       #  print("\tRestricción 1: " + str(g1(population[i].solucion)))
@@ -150,6 +154,8 @@ if __name__ == "__main__":
     print("------------------------ Ordenamiento")
     # Orden por aptitud Mínima
     population.sort(key=lambda x: x.aptitud, reverse=False)
+
+    imprimir(ejecucion, population, generacion)
     
     for i in range(POPULATION_SIZE):
         print(str(i + 1) + ".- " + str(population[i].solucion))
@@ -180,11 +186,10 @@ if __name__ == "__main__":
         population = population + hijos
         
         population.sort(key=lambda x: x.aptitud, reverse=False)
-        for i in range(20):
-            population.pop()
-
+        del population[-20:]
         print("Mejor generacion " + str(generacion))
         print("\t " + str(mejor.solucion))
         print("Aptitud: " + str(mejor.aptitud))
         generacion = generacion + 1
+        imprimir(ejecucion, population, generacion)
     
