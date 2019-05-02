@@ -14,13 +14,7 @@ class Individuo:
 def aptitud(lista):
     global evaluaciones
     evaluaciones = evaluaciones + 1
-    if not (g1(lista)):
-        return 1000000000.00
-    if not (g2(lista)):
-        return 1000000000.00
-    if not (g3(lista)):
-        return 1000000000.00
-    if not (g4(lista)):
+    if not (g1(lista) and g2(lista) and g3(lista) and g4(lista)):
         return 1000000000.00
     else:
         return (((lista[0]-10)**2)
@@ -33,8 +27,6 @@ def aptitud(lista):
                 - 4 * (lista[5] * lista[6])
                 - 10 * (lista[5])
                 - 8 * (lista[6]))
-              
-
 
 def g1(lista):
     return (-127 + (2 * (lista[0]**2))
@@ -42,20 +34,17 @@ def g1(lista):
         + lista[2] + (4 * (lista[3]**2))
         + (5 * lista[4])) <= 0
 
-
 def g2(lista):
     return (-282 + (7 * lista[0])
         + (3 * lista[1])
         + (10*(lista[2]**2))
         + lista[3] - lista[4]) <= 0
 
-
 def g3(lista):
     return (-196 + (23 * lista[0])
         + (lista[1]**2)
         + (6 * (lista[5]**2))
         - (8 * lista[6])) <= 0
-
 
 def g4(lista):
     return ((4 * (lista[0]**2))
@@ -141,16 +130,6 @@ if __name__ == "__main__":
         individuo.aptitud = aptitud(individuo.solucion)
         population.append(individuo)
 
-    # population = [np.around(np.random.uniform(-10, 10, size=(7)), decimals=3) for _ in range(POPULATION_SIZE)]
-    # for i in range(POPULATION_SIZE):
-     #   print(str(i + 1) + ".- " + str(population[i].solucion))
-      #  print("\tRestricción 1: " + str(g1(population[i].solucion)))
-       # print("\tRestricción 2: " + str(g2(population[i].solucion)))
-      #  print("\tRestricción 3: " + str(g3(population[i].solucion)))
-     #   print("\tRestricción 4: " + str(g4(population[i].solucion)))
-    #    print("\tAptitud: " + str(population[i].aptitud))
-
-    
     print("------------------------ Ordenamiento")
     # Orden por aptitud Mínima
     population.sort(key=lambda x: x.aptitud, reverse=False)
@@ -173,16 +152,11 @@ if __name__ == "__main__":
         for i in range (160):
                 padres.append(population[i])
         padres = seleccion(padres)
-        #for i in range(len(padres)):
-         #       print(str(i + 1) + ".- " + str(padres[i].solucion))
-          #      print("\tAptitud: " + str(padres[i].aptitud))
 
         # print("------------------------ Cruza y mutacion")
         hijos = cruza(padres)
         hijos = mutacion(hijos)
-        #for i in range(len(hijos)):
-         #       print(str(i + 1) + ".- " + str(hijos[i].solucion))
-          #      print("\tAptitud: " + str(hijos[i].aptitud))
+        
         population = population + hijos
         
         population.sort(key=lambda x: x.aptitud, reverse=False)
@@ -192,4 +166,3 @@ if __name__ == "__main__":
         print("Aptitud: " + str(mejor.aptitud))
         generacion = generacion + 1
         imprimir(ejecucion, population, generacion)
-    
