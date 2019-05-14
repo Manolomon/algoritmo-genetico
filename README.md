@@ -25,4 +25,4 @@ Donde <img src="https://latex.codecogs.com/gif.latex?-10\leq{x_i}\leq10,(i&space
 
 ## Análisis de Resultados
 
-El documento interactivo con los resultados se encuentra hosteado en: https://manolomon.github.io/algoritmo-genetico/
+El documento interactivo con los resultados se puede observar en: https://manolomon.github.io/genetic-algorithm-g9/
